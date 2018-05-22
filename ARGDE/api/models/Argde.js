@@ -1,19 +1,11 @@
-/**
- * Argde.js
- *
- * @description :: TODO: You might write a short summary of how this model works and what it represents here.
- * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
- */
-
 module.exports = {
   connection: 'postgresServer',
   tableName: 'twitter_data_feed',
   attributes: {
     id: {
-      type: 'integer',
-      size: 64,
+      type: 'bigint',
       columnName: 'id',
-      allowNull: true,
+      allowNull: false,
     },
     aidr: {
       type: 'json',
@@ -26,7 +18,7 @@ module.exports = {
       columnName: 'code',
       allowNull: true,
     },
-    created_at:{
+    createdAt:{
       type: 'datetime',
       columnName: 'created_at',
       allowNull: false,
@@ -52,7 +44,7 @@ module.exports = {
       columnName: 'source',
       allowNull: true,
     },
-    updated_at: {
+    updatedAt: {
       type: 'dateTime',
       columnName: 'updated_at',
       allowNull: false,
