@@ -1,5 +1,6 @@
 module.exports = {
 	createPreDays: function(params){
+		console.log(params);
 		var year = params['min'].getFullYear();
 		var month = params['min'].getMonth()+1;
 		var day = params['min'].getDate();

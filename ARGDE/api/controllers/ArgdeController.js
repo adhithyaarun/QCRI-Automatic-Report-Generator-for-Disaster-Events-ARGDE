@@ -41,7 +41,7 @@ module.exports = {
 					dayController.createPreDays(paramList);
 					minuteController.createPreMinutes(paramList);
 					labelController.createPreLabels(paramList);
-          res.send(200);
+          			res.send(200);
 				});
 			});
 		});
