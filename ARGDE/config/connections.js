@@ -80,7 +80,7 @@ module.exports.connections = {
     post: 5432,
     user: 'postgres',
     password: 'postgres',
-    database: 'aidr',
+    database: 'postgres',
   },
 
 
