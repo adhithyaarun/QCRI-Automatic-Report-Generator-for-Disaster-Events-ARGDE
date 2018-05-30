@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.area {
+  fill: orange;
+  clip-path: url(#clip);
+}
+
+.zoom {
+  cursor: move;
+  fill: none;
+  pointer-events: all;
+}
+
+</style>
+<svg width="960" height="500"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+var svg = d3.select("svg"),
+    margin = {top: 20, right: 20, bottom: 110, left: 40},
+    margin2 = {top: 430, right: 20, bottom: 30, left: 40},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom,
+    height2 = +svg.attr("height") - margin2.top - margin2.bottom;
+
+var parseDate = d3.timeParse("%d-%m-%Y,%H:%M");
+var parseTicks = d3.timeParse("%d-%m-%Y");
+
+
+var contains = function(needle) {
+    // Per spec, the way to identify NaN is that it is not equal to itself
+    var findNaN = needle !== needle;
+    var indexOf;
+
+    if(!findNaN && typeof Array.prototype.indexOf === 'function') {
+        indexOf = Array.prototype.indexOf;
+    } else {
+        indexOf = function(needle) {
+            var i = -1, index = -1;
+
+            for(i = 0; i < this.length; i++) {
+                var item = this[i];
+
+                if((findNaN && item !== item) || item === needle) {
+                    index = i;
+                    break;
+                }
+            }
+
+            return index;
+        };
+    }
+
+    return indexOf.call(this, needle) > -1;
+};
+
+var x = d3.scaleTime().range([0, width]),
+    x2 = d3.scaleTime().range([0, width]),
+    y = d3.scaleLinear().range([height, 0]),
+    y2 = d3.scaleLinear().range([height2, 0]);
+
+var xAxis = d3.axisBottom(x),
+    xAxis2 = d3.axisBottom(x2).tickFormat(d3.timeFormat("%b %Y")),
+    yAxis = d3.axisLeft(y);
+
+var brush = d3.brushX()
+    .extent([[0, 0], [width, height2]])
+    .on("brush end", brushed);
+
+var zoom = d3.zoom()
+    .scaleExtent([1, Infinity])
+    .translateExtent([[0, 0], [width, height]])
+    .extent([[0, 0], [width, height]])
+    .on("zoom", zoomed);
+
+var area = d3.area()
+    .curve(d3.curveMonotoneX)
+    .x(function(d) { return x(parseDate(d.fulltime)); })
+    .y0(height)
+    .y1(function(d) { return y(d.frequency); });
+
+var area2 = d3.area()
+    .curve(d3.curveMonotoneX)
+    .x(function(d) { return x2(parseDate(d.fulltime)); })
+    .y0(height2)
+    .y1(function(d) { return y2(d.frequency); });
+
+svg.append("defs").append("clipPath")
+    .attr("id", "clip")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+var focus = svg.append("g")
+    .attr("class", "focus")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var context = svg.append("g")
+    .attr("class", "context")
+    .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+
+
+var freqData = [];
+var minData = [];
+var hourData = [];
+var dateData = [];
+var monthData = [];
+var yearData = [];
+var data = [];
+var ticks = [];
+
+<% minute_data.forEach(function(entry){ %>
+  <%var fdat = (Number(entry.frequency)); %>
+  freqData = freqData.concat(<%=fdat%>); 
+  <%var mdat = (entry.minute); %>
+  minData = minData.concat(<%=mdat%>);
+  <%var hdat = (entry.hour); %>
+  hourData = hourData.concat(<%=hdat%>);
+  <%var ddat = (entry.date); %>
+  <%var date = String(ddat.getDate()); %>
+  <%var year = String(ddat.getFullYear()); %>
+  <%var month = String(ddat.getMonth()); %>
+  dateData = dateData.concat(<%=date%>);
+  monthData = monthData.concat(<%=month%>);
+  yearData = yearData.concat(<%=year%>);
+<% }); %>
+
+
+for(i in freqData){
+  var timeStamp;
+  if(minData[i]<10)
+  {
+    timeStamp = String(hourData[i]) + ":0" + String(minData[i]);
+  }
+  else
+  {
+  timeStamp = String(hourData[i]) + ":" + String(minData[i]);
+  }
+
+  var dateStamp = String(dateData[i])+"-"+String(Number(monthData[i] + 1))+"-"+String(yearData[i]);
+  var fullStamp = String(dateData[i])+"-"+String(Number(monthData[i] + 1))+"-"+String(yearData[i])+","+timeStamp;
+
+  var formatFreq = Number(freqData[i]);
+
+  data[i] = {time: timeStamp, frequency: formatFreq, date: dateStamp, fulltime: fullStamp};
+
+  if(contains.call(ticks, dateStamp)){
+    ticks.push(parseTicks(dateStamp));
+  } else{
+    console.log(dateStamp);
+    ticks.push(dateStamp);
+  }
+};
+
+  console.log(d3.extent(data, function(d) { return parseDate(d.fulltime); }));
+
+  x.domain(d3.extent(data, function(d) { return parseDate(d.fulltime); }));
+  y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
+  x2.domain(d3.extent(ticks, function(d) { return parseTicks(d); }));
+  y2.domain(y.domain());
+
+  focus.append("path")
+      .datum(data)
+      .attr("class", "area")
+      .attr("d", area);
+
+  focus.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  focus.append("g")
+      .attr("class", "axis axis--y")
+      .call(yAxis);
+
+  context.append("path")
+      .datum(data)
+      .attr("class", "area")
+      .attr("d", area2);
+
+  context.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + height2 + ")")
+      .call(xAxis2);
+
+  context.append("g")
+      .attr("class", "brush")
+      .call(brush)
+      .call(brush.move, x.range());
+
+  svg.append("rect")
+      .attr("class", "zoom")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+      .call(zoom);
+
+function brushed() {
+  if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
+  var s = d3.event.selection || x2.range();
+  x.domain(s.map(x2.invert, x2));
+  focus.select(".area").attr("d", area);
+  focus.select(".axis--x").call(xAxis);
+  svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
+      .scale(width / (s[1] - s[0]))
+      .translate(-s[0], 0));
+}
+
+function zoomed() {
+  if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return; // ignore zoom-by-brush
+  var t = d3.event.transform;
+  x.domain(t.rescaleX(x2).domain());
+  focus.select(".area").attr("d", area);
+  focus.select(".axis--x").call(xAxis);
+  context.select(".brush").call(brush.move, x.range().map(t.invertX, t));
+}
+
+function type(d) {
+  console.log(parseDate(d.fulltime));
+  d.fulltime = parseDate(d.fulltime);
+  d.frequency = +d.frequency;
+  return d;
+}
+
+</script>
