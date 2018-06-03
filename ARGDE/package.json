@@ -5,9 +5,14 @@
   "description": "a Sails application",
   "keywords": [],
   "dependencies": {
+<<<<<<< HEAD
     "c3": "^0.6.1",
     "d3": "^5.4.0",
     "d3-time-format": "^2.1.1",
+=======
+    "billboard.js": "^1.4.1",
+    "d3": "^5.4.0",
+>>>>>>> 2a6b3d66df54048cb34395ea64a99a277dd4db53
     "ejs": "2.3.4",
     "grunt": "1.0.1",
     "grunt-contrib-clean": "1.0.0",
@@ -25,7 +30,8 @@
     "rc": "1.0.1",
     "sails": "~0.12.14",
     "sails-disk": "~0.10.9",
-    "sails-postgresql": "^0.11.4"
+    "sails-postgresql": "^0.11.4",
+    "taucharts": "^2.2.3"
   },
   "scripts": {
     "debug": "node debug app.js",

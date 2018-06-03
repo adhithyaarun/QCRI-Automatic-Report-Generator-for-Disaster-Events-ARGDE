@@ -1,0 +1,34 @@
+<html>
+<head>
+  <title>
+    Sentiment Graph
+  </title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.1/c3.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.1/c3.min.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+<body>
+<div id="chart"></div>
+<script>
+var chart = c3.generate({
+  data: {
+    json: [
+      {name: 'www.site1.com', upload: 200, download: 200, total: 400},
+      {name: 'www.site2.com', upload: 100, download: 300, total: 400},
+      {name: 'www.site3.com', upload: 300, download: 200, total: 500},
+      {name: 'www.site4.com', upload: 400, download: 100, total: 500}
+    ],
+    keys: {
+      //x: '', // it's possible to specify 'x' when category axis
+      value: ['total',/* 'download'*/]
+    }
+  },
+  axis: {
+    x: {
+      // type: 'category'
+    }
+  }
+});
+</script>
+</body>
+</html>

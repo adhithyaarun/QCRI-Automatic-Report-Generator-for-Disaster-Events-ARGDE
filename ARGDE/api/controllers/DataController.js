@@ -110,7 +110,11 @@ module.exports = {
 						else
 						{
 							sails.log.info("Sentiment data retrieved, passing to view");
+<<<<<<< HEAD
 							return res.view('Dashboard/sentiment_freq', {sentiment_data: records.rows});
+=======
+							return res.view('argde/sentiment_freq', {sentiment_data: records.rows});
+>>>>>>> 2a6b3d66df54048cb34395ea64a99a277dd4db53
 						}
 					});
 				}
@@ -167,4 +171,8 @@ module.exports = {
 			}
 		);
 	},
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> 2a6b3d66df54048cb34395ea64a99a277dd4db53
