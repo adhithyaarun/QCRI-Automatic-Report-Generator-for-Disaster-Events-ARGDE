@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <script src="//cdn.jsdelivr.net/d3js/3.5.17/d3.min.js" charset="utf-8"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.0/underscore-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/taucharts@1/build/production/tauCharts.min.js" type="text/javascript"></script>
+  
+  <style>
+
+      .graphical-report__svg{
+        width: 500em;
+      }
+
+      .color-us {
+      stroke: blue
+      }
+
+      .color-bug {
+      stroke: red
+      }
+
+      html,
+      body,
+      #target {
+        position:relative;
+        overflow-x: scroll;
+        height: 100%;
+        width: 300%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #target > svg {
+        display: inline-block;
+      }
+
+    }
+
+  </style>
+
+
+  <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/taucharts@1/build/production/tauCharts.min.css">
+
+  <title>Minute Based - TauCharts</title>
+</head>
+<body id = "target">
+<script>
+
+var contains = function(needle) {
+    // Per spec, the way to identify NaN is that it is not equal to itself
+    var findNaN = needle !== needle;
+    var indexOf;
+
+    if(!findNaN && typeof Array.prototype.indexOf === 'function') {
+        indexOf = Array.prototype.indexOf;
+    } else {
+        indexOf = function(needle) {
+            var i = -1, index = -1;
+
+            for(i = 0; i < this.length; i++) {
+                var item = this[i];
+
+                if((findNaN && item !== item) || item === needle) {
+                    index = i;
+                    break;
+                }
+            }
+
+            return index;
+        };
+    }
+
+    return indexOf.call(this, needle) > -1;
+};
+
+var index = function(needle) {
+            var i = -1, index = -1;
+
+            for(i = 0; i < this.length; i++) {
+                var item = this[i];
+
+                if((findNaN && item !== item) || item === needle) {
+                    index = i;
+                    break;
+                }
+            }
+
+            return index;
+        };
+
+
+var sortedData = [];
+
+var freqData = [];
+var clData = [];
+var minData = [];
+var hourData = [];
+var dateData = [];
+var monthData = [];
+var yearData = [];
+var data = [];
+var ticks = [];
+var ldat;
+<% class_data.forEach(function(entry){ %>
+  <%var fdat = (Number(entry.frequency)); %>
+  freqData = freqData.concat(<%=fdat%>); 
+  <% ldat = String(entry.class_label); %>
+  <%var class_str  = ldat.toString(); %>
+  console.log(typeof(class_str));
+  clData = clData.concat('<%=(ldat)%>');
+  <%var mdat = String(entry.minute); %>
+  minData = minData.concat(<%=mdat%>);
+  <%var hdat = String(entry.hour).substr(0,2); %>
+  hourData = hourData.concat(<%=hdat%>);
+  <%var ddat = (entry.date); %>
+  <%var date = String(ddat.getDate()); %>
+  <%var year = String(ddat.getFullYear()); %>
+  <%var month = String(ddat.getMonth()); %>
+  dateData = dateData.concat(<%=date%>);
+  monthData = monthData.concat(<%=month%>);
+  yearData = yearData.concat(<%=year%>);
+<% }); %>
+
+
+for(i in freqData){
+
+  var timeStamp;
+
+  if(minData[i]<10)
+  {
+    timeStamp = String(hourData[i]) + ":0" + String(minData[i]);
+  }
+  else
+  {
+  timeStamp = String(hourData[i]) + ":" + String(minData[i]);
+  }
+
+  var dateStamp = String(yearData[i])+"-"+String(Number(monthData[i] + 1))+"-"+String(dateData[i]) +","+timeStamp;
+
+  var d = new Date(Number(yearData[i]), Number(monthData[i]), Number(dateData[i]));
+
+  var formatFreq = Number(freqData[i]);
+
+  if(clData[i] == "infrastructure_and_utilities_damage"){
+    clData[i] =  "Infrastructure and Utilities Damage";
+  } else if(clData[i] == "caution_and_advice"){
+    clData[i] = "Caution and Advice";
+  } else if(clData[i] == "displaced_and_evacuations"){
+    clData[i] = "Displaced and Evacuations";
+  } else if(clData[i] == "affected_individual"){
+    clData[i] = "Affected Individuals";
+  } else if(clData[i] == "donation_and_volunteering"){
+    clData[i] = "Donation and Volunteering";
+  } else if(clData[i] == "missing_and_found_people"){
+    clData[i] = "Missing and Found People";
+  } else if(clData[i] == "injured_or_dead_people"){
+    clData[i] = "Injured or Dead People";
+  } else if(clData[i] == "sympathy_and_support"){
+    clData[i] = "Sympathy and Support";
+  } else if(clData[i] == "relevant_information"){
+    clData[i] = "Relevant Information";
+  } else if(clData[i] == "not_related_or_irrelevant"){
+    clData[i] = "Not Related or Irrelevant";
+  } else if(clData[i] == "response_efforts"){
+    clData[i] = "Response Efforts";
+  } else if(clData[i] == "personal"){
+    clData[i] = "Personal";
+  }
+
+  data[i] = {date: dateStamp, frequency: formatFreq ,label: clData[i]};
+  //console.log(data[i]);
+};
+
+
+
+new tauCharts.Chart({
+    data: data,
+    type: 'stacked-bar',
+    x: 'date',
+    y: 'frequency',
+    color: 'label',
+    guide: {
+      y:{
+        label: 'Frequency',
+      },
+      color: {
+        brewer: {
+          'Injured or Dead People': '#824d3b',
+          'Donation and Volunteering': '#8e48a0',
+          'Not Related or Irrelevant' : '#000000' ,
+          'Response Efforts': '#8081d9',
+          'Sympathy and Support': '#38ad01',
+          'Personal': '#4289f4',
+          'Relevant Information': '#bdf0fc',
+          'Displaced and Evacuations': '#a5af33',
+          'Caution and Advice': '#ffb600',
+          'Affected Individuals': '#da96e8',
+          'Infrastructure and Utilities Damage': '#b20000',
+          'Missing and Found People': '#595959'
+        }
+      }
+    },
+    plugins: [
+        tauCharts.api.plugins.get('tooltip')(),
+        tauCharts.api.plugins.get('legend')({'position': 'left'}),
+        tauCharts.api.plugins.get('floating-axes'),
+    ],
+    
+}).renderTo('#target');
+
+
+</script>
+</body>
+
+</html>
