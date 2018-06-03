@@ -37,9 +37,9 @@ module.exports = {
 				+"';",function(err, result){
 					date_diff = result.rows[0]['?column?'];
 					paramList={'min':min_date, 'max':max_date, 'diff':date_diff, 'collection': req.param('collection')};
-					hourController.createPreHours(paramList);
-					dayController.createPreDays(paramList);
-					minuteController.createPreMinutes(paramList);
+					// hourController.createPreHours(paramList);
+					// dayController.createPreDays(paramList);
+					// minuteController.createPreMinutes(paramList);
 					labelController.createPreLabels(paramList);
           res.send(200);
 				});

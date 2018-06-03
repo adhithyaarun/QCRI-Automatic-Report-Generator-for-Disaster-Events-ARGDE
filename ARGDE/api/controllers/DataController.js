@@ -110,7 +110,7 @@ module.exports = {
 						else
 						{
 							sails.log.info("Sentiment data retrieved, passing to view");
-							return res.view('Dashboard/sentiment_freq', {sentiment_data: records.rows});
+							return res.view('argde/sentiment_freq', {sentiment_data: records.rows});
 						}
 					});
 				}

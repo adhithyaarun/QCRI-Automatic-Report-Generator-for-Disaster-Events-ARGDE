@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="//cdn.jsdelivr.net/d3js/3.5.17/d3.min.js" charset="utf-8"></script>
+<script src="//cdn.jsdelivr.net/npm/taucharts@1/build/production/tauCharts.min.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/taucharts@1/build/production/tauCharts.min.css">
+<br><br>
+<div id="line"></div>
+<style>
+body{
+    height:100%;
+}
+#line{
+  height: 56.25em;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+.color-blue {
+  stroke:blue
+}
+.color-red {
+  stroke:red
+}
+.color-green {
+  stroke:green
+}
+.color-orange {
+  stroke: darkorange
+}
+.color-purple {
+  stroke: purple
+}
+#line > svg {
+  display: block;
+}
+</style>
+<script>
+var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var final_data = [];
+var obj;
+var date;
+var year;
+var month;
+var day;
+var hour;
+var minute;
+var time;
+<% sentiment_data.forEach(function(sentiment){ %>
+  obj = <%- JSON.stringify(sentiment) %>;
+  date = new Date(obj.date);
+  year = date.getFullYear();
+  month = date.getMonth();
+  day = date.getDate();
+  hour = obj.hour.substr(0,2);
+  if(obj.minute < 10)
+  {
+    minute = "0"+String(obj.minute);
+  }
+  else
+  {
+    minute = obj.minute;
+  }
+  obj.sentiment = obj.class_label;
+  obj.frequency = Number(obj.frequency);
+  obj.compiled_time = String(day)+" "+months[month]+" "+year+" "+hour+":"+String(minute);
+  /*String(year)+"-"+String(month)+"-"+String(day)+" "+hour+":"+String(minute)*/
+  final_data.push(obj);
+<%});%>
+var graph_type = 'stacked-bar';
+var chart = new tauCharts.Chart({
+            data: final_data,
+            type: graph_type,
+            x: 'compiled_time',
+            y: 'frequency',
+            color: 'sentiment',
+            guide:{
+              x:{label: 'Minute'},
+              y:{label: 'Frequency'},
+              color:{
+                brewer:
+                {
+                  'Very positive':'#0f0',
+                  'Positive':'#00f',
+                  'Neutral':'#666',
+                  'Negative':'#fc8d59',
+                  'Very negative':'#f00',
+                }
+              },
+            },
+            plugins: [
+              tauCharts.api.plugins.get('legend')({position: 'left'}),
+              tauCharts.api.plugins.get('tooltip')({fields: ['compiled_time','frequency']}),
+            ],
+        });
+
+  chart.renderTo('#line');
+</script>
