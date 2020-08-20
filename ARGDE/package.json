@@ -5,7 +5,7 @@
   "description": "a Sails application",
   "keywords": [],
   "dependencies": {
-    "bcrypt": "^2.0.1",
+    "bcrypt": "^5.0.0",
     "billboard.js": "^1.4.1",
     "connect-redis": "^3.3.3",
     "d3": "^5.4.0",
